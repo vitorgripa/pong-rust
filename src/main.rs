@@ -7,15 +7,16 @@ mod game;
 
 use game::Game;
 
-use piston::{Button, ButtonState};
 use piston::event_loop::{Events, EventSettings};
-use piston::input::{UpdateEvent, ButtonEvent, Key};
+use piston::input::{UpdateEvent, ButtonEvent};
+use piston::ButtonState;
+
 
 use piston_window::{PistonWindow, WindowSettings};
 
 use opengl_graphics::OpenGL;
 
-use graphics::{Context, Graphics, Transformed, clear, line, rectangle, text};
+use graphics::{Transformed, clear, rectangle, text};
 
 const WHITE: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
 const BLACK: [f32; 4] = [0.0, 0.0, 0.0, 0.0];

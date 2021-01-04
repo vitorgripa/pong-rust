@@ -1,5 +1,5 @@
-use piston::{Button, ButtonState};
-use piston::input::{UpdateEvent, ButtonEvent, Key};
+use piston::{Button};
+use piston::input::{Key};
 
 mod player;
 mod ball;
@@ -9,16 +9,10 @@ use player::Player;
 use ball::Ball;
 use field::Field;
 
-const WHITE: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
-const BLACK: [f32; 4] = [0.0, 0.0, 0.0, 0.0];
-
 const WINDOW_MARGIN: f64 = 15.0;
 
 const WINDOW_WIDTH: f64 = 600.0;
 const WINDOW_HEIGHT: f64 = 400.0;
-
-const TRANSFORM_CENTER_SCREEN_X: f64 = WINDOW_WIDTH / 2.0;
-const TRANSFORM_CENTER_SCREEN_Y: f64 = WINDOW_HEIGHT / 2.0;
 
 pub struct Game {
     pub players: [Player; 2],
@@ -49,7 +43,7 @@ impl Game {
             ball: Ball::new(),
             field: Field::new(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_MARGIN),
             players,
-            state: 0
+            state: 1
         }
     }
 
