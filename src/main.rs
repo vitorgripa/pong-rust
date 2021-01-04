@@ -6,9 +6,12 @@ extern crate opengl_graphics;
 use piston::{Button, ButtonState};
 use piston::event_loop::{Events, EventSettings};
 use piston::input::{UpdateEvent, ButtonEvent, Key};
+
 use piston_window::{PistonWindow, WindowSettings};
+
 use opengl_graphics::OpenGL;
-use graphics::{clear, rectangle, line, text, Transformed};
+
+use graphics::{clear, rectangle, line, text, Transformed, Context};
 
 const WHITE: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
 const BLACK: [f32; 4] = [0.0, 0.0, 0.0, 0.0];
@@ -174,7 +177,7 @@ pub struct Game {
     players: [Player; 2],
     ball: Ball,
     field: Field,
-    state: i32
+    state: i32,
 }
 
 /* States {
@@ -197,7 +200,6 @@ impl Game {
     }
 
     fn new() -> Self {
-
         let players: [Player; 2] = [
             Player::new(250.0, 1),
             Player::new(-250.0, 2)
@@ -351,15 +353,15 @@ fn main() {
     let mut events = Events::new(EventSettings::new());
 
     while let Some(e) = events.next(&mut window) {
-        window.draw_2d(&e, |context, graphics, device| {
+
+        window.draw_2d(&e, |context: Context, graphics, device| {
             clear(game.field.background_color, graphics);
-            
 
             let center_screen_transform = context
             .transform
             .trans(TRANSFORM_CENTER_SCREEN_X, TRANSFORM_CENTER_SCREEN_Y);
 
-            let player1_score_transform = context
+            let player1_score_transform  = context
                 .transform
                 .trans(TRANSFORM_CENTER_SCREEN_X, TRANSFORM_CENTER_SCREEN_Y)
                 .trans(50.0, 8.0);
