@@ -29,6 +29,7 @@ impl Game {
         }
 
         self.ball.reset_position();
+        self.ball.reset_acceleration();
 
         self.start();
     }
@@ -67,7 +68,7 @@ impl Game {
     }
 
     pub fn check_lose_game(&self) -> bool{
-        if self.ball.position_x + self.ball.width > self.players[0].position_x || self.ball.position_x < self.players[1].position_x + self.players[1].width {
+        if self.ball.position_x > self.players[0].position_x + self.players[0].width || self.ball.position_x + self.ball.width < self.players[1].position_x {
             return true
         }
 
@@ -78,13 +79,17 @@ impl Game {
         match self.state {
             0 => {
 
-                for player in self.players.iter() {
-                    self.ball.check_collision(
+                for player in self.players.iter_mut() {
+                    let player_collision: bool = self.ball.check_collision(
                         &player.position_x,
                         &(player.position_x + player.width),
                         &player.position_y,
                         &(player.position_y + player.height)
                     );
+
+                    if player_collision {
+                        player.make_point();
+                    }
                 };
 
 

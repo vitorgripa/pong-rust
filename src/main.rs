@@ -11,7 +11,6 @@ use piston::event_loop::{Events, EventSettings};
 use piston::input::{UpdateEvent, ButtonEvent};
 use piston::ButtonState;
 
-
 use piston_window::{PistonWindow, WindowSettings};
 
 use opengl_graphics::OpenGL;
