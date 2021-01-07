@@ -65,6 +65,7 @@ impl Game {
 
     pub fn start(&mut self) {
         self.change_game_state(0);
+        self.ball.randomize_angle();
     }
 
     pub fn check_lose_game(&self) -> bool{
@@ -110,7 +111,6 @@ impl Game {
 
                 self.ball.position_y += self.ball.acceleration_y;
                 self.ball.position_x += self.ball.acceleration_x;
-
             }
             _ => {
             }
@@ -157,6 +157,9 @@ impl Game {
                 } else {
                     self.start();
                 }
+            },
+            &Button::Keyboard(Key::K) => {
+                self.ball.randomize_angle();
             }
             _ => {}
         }

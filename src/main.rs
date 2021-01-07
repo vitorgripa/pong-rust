@@ -10,23 +10,26 @@ use game::Game;
 use piston::event_loop::{Events, EventSettings};
 use piston::input::{UpdateEvent, ButtonEvent};
 use piston::ButtonState;
-
 use piston_window::{PistonWindow, WindowSettings};
 
 use opengl_graphics::OpenGL;
 
-use graphics::{Transformed, clear, rectangle, text};
+// use graphics::{clear, rectangle, text};
+use graphics::{clear, rectangle};
 
-const WHITE: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
+// const WHITE: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
 const BLACK: [f32; 4] = [0.0, 0.0, 0.0, 0.0];
 
-const WINDOW_MARGIN: f64 = 15.0;
 
 const WINDOW_WIDTH: f64 = 600.0;
 const WINDOW_HEIGHT: f64 = 400.0;
 
-const TRANSFORM_CENTER_SCREEN_X: f64 = WINDOW_WIDTH / 2.0;
-const TRANSFORM_CENTER_SCREEN_Y: f64 = WINDOW_HEIGHT / 2.0;
+const WINDOW_MARGIN: f64 = (1280.0 * 720.0) * 0.2;
+
+// const TRANSFORM_CENTER_SCREEN_X: f64 = WINDOW_WIDTH / 2.0;
+// const TRANSFORM_CENTER_SCREEN_Y: f64 = WINDOW_HEIGHT / 2.0;
+
+const CENTER_SCREEN_TRANSFORM: [[f64; 3]; 2] = [[0.0033333333333333335, 0.0, 0.0], [0.0, -0.005, 0.0]];
 
 fn main() {
     let opengl: OpenGL = OpenGL::V3_2;
@@ -37,6 +40,7 @@ fn main() {
         .resizable(false)
         .build()
         .unwrap();
+        
     
     let mut glyphs_cache = window.load_font("assets/fonts/Roboto-Medium.ttf").unwrap();
 
@@ -47,33 +51,16 @@ fn main() {
     let mut events = Events::new(EventSettings::new());
 
     while let Some(e) = events.next(&mut window) {
-        window.draw_2d(&e, |context, graphics, device| {
+        window.draw_2d(&e, |_context, graphics, device| {
             clear(BLACK, graphics);
-            
-            let center_screen_transform = context
-            .transform
-            .trans(TRANSFORM_CENTER_SCREEN_X, TRANSFORM_CENTER_SCREEN_Y);
 
-            let player1_score_transform  = context
-                .transform
-                .trans(TRANSFORM_CENTER_SCREEN_X, TRANSFORM_CENTER_SCREEN_Y)
-                .trans(50.0, 8.0);
-            
-            let player2_score_transform = context
-                .transform
-                .trans(TRANSFORM_CENTER_SCREEN_X, TRANSFORM_CENTER_SCREEN_Y)
-                .trans(-50.0, 8.0);
+            game.field.external_walls.iter().for_each(|wall| rectangle(wall.color, [wall.position_x, wall.position_y, wall.width, wall.height], CENTER_SCREEN_TRANSFORM , graphics));
 
-            game.field.external_walls.iter().for_each(|wall| rectangle(wall.color, [wall.position_x, wall.position_y, wall.width, wall.height], center_screen_transform, graphics));
+            game.players.iter().for_each(|player| rectangle(player.color, [player.position_x, player.position_y, player.width, player.height], CENTER_SCREEN_TRANSFORM, graphics));
 
-            game.players.iter().for_each(|player| rectangle(player.color, [player.position_x, player.position_y, player.width, player.height], center_screen_transform, graphics));
+            rectangle([1.0, 1.0, 1.0, 0.1], [-1.0, 0.0 - WINDOW_HEIGHT / 2.0 + WINDOW_MARGIN, 2.0, WINDOW_HEIGHT - WINDOW_MARGIN * 2.0], CENTER_SCREEN_TRANSFORM, graphics);
 
-            rectangle([1.0, 1.0, 1.0, 0.1], [-1.0, 0.0 - WINDOW_HEIGHT / 2.0 + WINDOW_MARGIN, 2.0, WINDOW_HEIGHT - WINDOW_MARGIN * 2.0], center_screen_transform, graphics);
-
-            text(WHITE, 16, &format!("{}", game.players[0].score), &mut glyphs_cache, player1_score_transform, graphics).unwrap();
-            text(WHITE, 16, &format!("{}", game.players[1].score), &mut glyphs_cache, player2_score_transform, graphics).unwrap();
-
-            rectangle(game.ball.color, [game.ball.position_x, game.ball.position_y, game.ball.width, game.ball.height], center_screen_transform, graphics);
+            rectangle(game.ball.color, [game.ball.position_x, game.ball.position_y, game.ball.width, game.ball.height], CENTER_SCREEN_TRANSFORM, graphics);
 
             glyphs_cache.factory.encoder.flush(device);
         });

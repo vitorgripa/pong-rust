@@ -1,8 +1,14 @@
+extern crate rand;
+
+use rand::*;
+
 const BALL_HEIGHT: f64 = 10.0;
 const BALL_WIDTH: f64 = 10.0;
 
 const MAX_ACCELERATION: f64 = 5.0;
-const ACCELERATION_INCREMENT: f64 = 1.05;
+const ACCELERATION_INCREMENT: f64 = 1.15;
+
+
 pub struct Ball {
     pub position_y: f64,
     pub position_x: f64,
@@ -10,7 +16,8 @@ pub struct Ball {
     pub height: f64,
     pub acceleration_x: f64,
     pub acceleration_y: f64,
-    pub color: [f32; 4]
+    pub color: [f32; 4],
+    pub angle: f64
 }
 
 impl Ball {
@@ -23,7 +30,8 @@ impl Ball {
             height: BALL_HEIGHT,
             acceleration_x: 1.0,
             acceleration_y: 1.0,
-            color: [1.0, 1.0, 1.0, 1.0,]
+            color: [1.0, 1.0, 1.0, 1.0,],
+            angle: -180.0
         }
     }
 
@@ -92,14 +100,14 @@ impl Ball {
         let touch_up: bool = self.check_touch_up(ball_x1, ball_x2, ball_y1, ball_y2, obj_x1, obj_x2, obj_y1, obj_y2);
 
         let touch_down: bool = self.check_touch_down(ball_x1, ball_x2, ball_y1, ball_y2, obj_x1, obj_x2, obj_y1, obj_y2);
-
+        
         if touch_right || touch_left {
-            self.increase_acceleration_x();
             self.reverse_x();
+            self.increase_acceleration_x();
             return true;
         } else if touch_down || touch_up {
-            self.increase_acceleration_y();
             self.reverse_y();
+            self.increase_acceleration_y();
             return true;
         }
 
@@ -114,5 +122,11 @@ impl Ball {
     pub fn reset_acceleration(&mut self) {
         self.acceleration_y = 1.0;
         self.acceleration_x = 1.0;
+    }
+
+    pub fn randomize_angle(&mut self) {
+        self.angle = rand::thread_rng().gen_range(-60.0..60.0);
+        self.acceleration_x = self.angle.cos();
+        self.acceleration_y = self.angle.sin();
     }
 }
