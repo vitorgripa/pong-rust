@@ -5,8 +5,7 @@ mod game;
 use game::Game;
 
 fn main() {
-
-    let mut game = Game::new().unwrap_or_else(|err| {
+    let mut game: Game = Game::new().unwrap_or_else(|err| {
         eprintln!("Error creating game: {}", err);
         process::exit(1);
     });

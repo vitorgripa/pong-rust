@@ -1,6 +1,12 @@
+extern crate serde;
+extern crate serde_json;
+
+use std::fs::File;
+use std::io::BufReader;
 use std::error::Error;
+use serde::{Serialize, Deserialize};
 use opengl_graphics::OpenGL;
-use piston::{Button, ButtonState, EventSettings, Events, WindowSettings};
+use piston::{Button, ButtonState, EventSettings, Events, Size, WindowSettings};
 use piston::input::{Key};
 
 mod player;
@@ -22,25 +28,105 @@ const WINDOW_MARGIN: f64 = 15.0;
 const WINDOW_WIDTH: f64 = 600.0;
 const WINDOW_HEIGHT: f64 = 400.0;
 const SEPARATOR_COLOR: [f32; 4] = [1.0, 1.0, 1.0, 0.1];
+const WINDOW_SIZES: [[f64; 2]; 9] = [
+    [320.0, 240.0],
+    [640.0, 360.0],
+    [800.0, 600.0],
+    [1024.0, 768.0],
+    [1280.0, 720.0],
+    [1366.0, 768.0],
+    [1440.0, 900.0],
+    [1600.0, 900.0],
+    [1920.0, 1080.0]
+];
 
-const WHITE: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
+#[derive(Debug, Serialize, Deserialize)]
+enum GameDificulty {
+    Easy,
+    Medium,
+    Hard
+}
 
+#[derive(Debug, Serialize, Deserialize)]
+struct SoundOptions {
+    effects_volume: f64,
+    music_volume: f64
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct GraphicsOptions{
+    window_size: [f64; 2],
+    fullscreen: bool,
+    vsync: bool
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct GameOptions {
+    dificulty: GameDificulty
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Settings {
+    sound_options: SoundOptions,
+    graphics_options: GraphicsOptions,
+    game_options: GameOptions
+}
+
+impl Settings {
+    pub fn new() -> Result<Settings, Box<dyn Error>> {
+        let settings_file: File = File::open("settings.json")?;
+        let settings_reader: BufReader<File> = BufReader::new(settings_file);
+
+        let settings: Settings = serde_json::from_reader(settings_reader)?;
+
+        Ok(settings)
+    }
+
+}
 pub struct Game {
     pub players: [Player; 2],
     pub ball: Ball,
     pub field: Field,
     pub state: i32,
     pub menu: Menu,
-    pub window: PistonWindow
+    pub window: PistonWindow,
+    pub settings: Settings
 }
 
 impl Game {
     pub fn new() -> Result<Game, Box<dyn Error>> {
-        let window: PistonWindow = WindowSettings::new("Pong", [WINDOW_WIDTH, WINDOW_HEIGHT])
+        let settings: Settings = Settings::new()?;
+
+        let title: String = String::from("PONG");
+        let window_size: Size = Size::from(settings.graphics_options.window_size);
+        let samples: u8 = 0;
+        let fullscreen: bool = settings.graphics_options.fullscreen;
+        let exit_on_esc: bool = true;
+        let automatic_close: bool = true;
+        let vsync: bool = settings.graphics_options.vsync;
+        let srgb: bool = true;
+        let resizable: bool = false;
+        let decorated: bool = false;
+        let controllers: bool = true;
+        let transparent: bool = true;
+
+        let window_settings: WindowSettings = WindowSettings::new(
+            title,
+            window_size
+        )
             .graphics_api(GRAPHICS_API)
-            .exit_on_esc(true)
-            .resizable(false)
-            .build()?;
+            .exit_on_esc(exit_on_esc)
+            .automatic_close(automatic_close)
+            .vsync(vsync)
+            .srgb(srgb)
+            .resizable(resizable)
+            .decorated(decorated)
+            .controllers(controllers)
+            .transparent(transparent)
+            .fullscreen(fullscreen)
+            .samples(samples);
+
+        let window: PistonWindow = window_settings.build()?;
 
         let player1: Player = Player::new(250.0, 1)?;
         let player2: Player = Player::new(-250.0, 2)?; 
@@ -65,7 +151,8 @@ impl Game {
                 players,
                 state,
                 menu,
-                window
+                window,
+                settings
             }
         )
     }
@@ -209,7 +296,7 @@ impl Game {
                 clear(field.background_color, graphics);
 
                 external_walls.iter().for_each(|wall| {
-                    rectangle(WHITE, [wall.position_x, wall.position_y, wall.width, wall.height], CENTER_SCREEN_TRANSFORM , graphics);
+                    rectangle(wall.color, [wall.position_x, wall.position_y, wall.width, wall.height], CENTER_SCREEN_TRANSFORM , graphics);
                 });
 
                 players.iter().for_each(|player| {

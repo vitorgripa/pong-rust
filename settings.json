@@ -1,0 +1,14 @@
+{
+    "game_options": {
+        "dificulty": "Easy"
+    },
+    "sound_options": {
+        "effects_volume": 100.0,
+        "music_volume": 100.0
+    },
+    "graphics_options": {
+        "window_size": [640.0, 480.0],
+        "fullscreen": false,
+        "vsync": false
+    }
+}
