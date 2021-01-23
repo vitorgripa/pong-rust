@@ -1,5 +1,8 @@
+use std::error::Error;
+
 const PLAYER_WIDTH: f64 = 5.0;
 const PLAYER_HEIGHT: f64 = 60.0;
+const PLAYER_COLOR: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
 
 pub struct Player {
     pub number: u8,
@@ -12,34 +15,28 @@ pub struct Player {
 }
 
 impl Player {
-    pub fn new(position_x: f64, number: u8) -> Self {
-        Self {
-            position_y: 0.0 - PLAYER_HEIGHT / 2.0,
-            position_x,
-            width: PLAYER_WIDTH,
-            height: PLAYER_HEIGHT,
-            color: [1.0, 1.0, 1.0, 1.0],
-            score: 0,
-            number
-        }
+    pub fn new(position_x: f64, number: u8) -> Result<Player, Box<dyn Error>> {
+        let position_y: f64 = 0.0 - PLAYER_HEIGHT / 2.0;
+        let width: f64 = PLAYER_WIDTH;
+        let height: f64 = PLAYER_HEIGHT;
+        let color: [f32; 4] = PLAYER_COLOR;
+        let score: u32 = 0;
+
+        Ok(
+            Player {
+                position_y,
+                position_x,
+                width,
+                height,
+                color,
+                score,
+                number
+            }
+        )
     }
 
     pub fn make_point(&mut self) {
         self.score += 1;
-    }
-
-    pub fn reset_score(&mut self) {
-        self.score = 0;
-    }
-
-    pub fn reset_position(&mut self) {
-        match self.number {
-            1 => {self.position_x = 250.0},
-            2 => {self.position_x = -250.0},
-            _ => {}
-        }
-
-        self.position_y = 0.0 - self.height / 2.0 
     }
 
     pub fn move_up(&mut self) {

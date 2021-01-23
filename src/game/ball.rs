@@ -1,3 +1,5 @@
+use std::error::Error;
+
 extern crate rand;
 
 use rand::*;
@@ -22,17 +24,19 @@ pub struct Ball {
 
 impl Ball {
 
-    pub fn new() -> Self {
-        Self {
-            position_x: 0.0,
-            position_y: 0.0,
-            width: BALL_WIDTH,
-            height: BALL_HEIGHT,
-            acceleration_x: 1.0,
-            acceleration_y: 1.0,
-            color: [1.0, 1.0, 1.0, 1.0,],
-            angle: -180.0
-        }
+    pub fn new() -> Result<Ball, Box<dyn Error>> {
+        Ok(
+            Ball {
+                position_x: 0.0 - BALL_WIDTH / 2.0,
+                position_y: 0.0 - BALL_HEIGHT / 2.0,
+                width: BALL_WIDTH,
+                height: BALL_HEIGHT,
+                acceleration_x: 1.0,
+                acceleration_y: 1.0,
+                color: [1.0, 1.0, 1.0, 1.0,],
+                angle: Ball::randomize_angle()
+            }
+        )
     }
 
     pub fn reverse_x(&mut self) {
@@ -114,19 +118,7 @@ impl Ball {
         false
     }
 
-    pub fn reset_position(&mut self) {
-        self.position_x = 0.0 - self.width / 2.0;
-        self.position_y = 0.0 - self.height / 2.0;
-    }
-
-    pub fn reset_acceleration(&mut self) {
-        self.acceleration_y = 1.0;
-        self.acceleration_x = 1.0;
-    }
-
-    pub fn randomize_angle(&mut self) {
-        self.angle = rand::thread_rng().gen_range(-60.0..60.0);
-        self.acceleration_x = self.angle.cos();
-        self.acceleration_y = self.angle.sin();
+    pub fn randomize_angle() -> f64 {
+        rand::thread_rng().gen_range(-60.0..60.0)
     }
 }
