@@ -1,15 +1,11 @@
 use std::error::Error;
-
-extern crate rand;
-
 use rand::*;
 
 const BALL_HEIGHT: f64 = 10.0;
 const BALL_WIDTH: f64 = 10.0;
-
+const BALL_COLOR: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
 const MAX_ACCELERATION: f64 = 5.0;
 const ACCELERATION_INCREMENT: f64 = 1.15;
-
 
 pub struct Ball {
     pub position_y: f64,
@@ -25,16 +21,25 @@ pub struct Ball {
 impl Ball {
 
     pub fn new() -> Result<Ball, Box<dyn Error>> {
+        let position_x: f64 = 0.0 - BALL_WIDTH / 2.0;
+        let position_y: f64 = 0.0 - BALL_HEIGHT / 2.0;
+        let width: f64 = BALL_WIDTH;
+        let height: f64 = BALL_HEIGHT;
+        let acceleration_x: f64 = 1.0;
+        let acceleration_y: f64 = 1.0;
+        let color: [f32; 4] = BALL_COLOR;
+        let angle: f64 = Ball::randomize_angle();
+
         Ok(
             Ball {
-                position_x: 0.0 - BALL_WIDTH / 2.0,
-                position_y: 0.0 - BALL_HEIGHT / 2.0,
-                width: BALL_WIDTH,
-                height: BALL_HEIGHT,
-                acceleration_x: 1.0,
-                acceleration_y: 1.0,
-                color: [1.0, 1.0, 1.0, 1.0,],
-                angle: Ball::randomize_angle()
+                position_x,
+                position_y,
+                width,
+                height,
+                acceleration_x,
+                acceleration_y,
+                color,
+                angle
             }
         )
     }
