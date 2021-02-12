@@ -12,13 +12,11 @@ use piston::input::{Key};
 mod player;
 mod ball;
 mod field;
-mod menu;
 
 use piston_window::PistonWindow;
 use player::Player;
 use ball::Ball;
 use field::Field;
-use menu::Menu;
 use graphics::*;
 use piston::input::{UpdateEvent, ButtonEvent};
 
@@ -28,17 +26,6 @@ const WINDOW_MARGIN: f64 = 15.0;
 const WINDOW_WIDTH: f64 = 600.0;
 const WINDOW_HEIGHT: f64 = 400.0;
 const SEPARATOR_COLOR: [f32; 4] = [1.0, 1.0, 1.0, 0.1];
-const WINDOW_SIZES: [[f64; 2]; 9] = [
-    [320.0, 240.0],
-    [640.0, 360.0],
-    [800.0, 600.0],
-    [1024.0, 768.0],
-    [1280.0, 720.0],
-    [1366.0, 768.0],
-    [1440.0, 900.0],
-    [1600.0, 900.0],
-    [1920.0, 1080.0]
-];
 
 #[derive(Debug, Serialize, Deserialize)]
 enum GameDificulty {
@@ -88,7 +75,6 @@ pub struct Game {
     pub ball: Ball,
     pub field: Field,
     pub state: i32,
-    pub menu: Menu,
     pub window: PistonWindow,
     pub settings: Settings
 }
@@ -140,8 +126,6 @@ impl Game {
 
         let field: Field = Field::new(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_MARGIN)?;
 
-        let menu: Menu = Menu::new()?;
-
         let state: i32 = 0;
         
         Ok(
@@ -150,7 +134,6 @@ impl Game {
                 field,
                 players,
                 state,
-                menu,
                 window,
                 settings
             }
@@ -232,43 +215,23 @@ impl Game {
     pub fn key_pressed(&mut self, btn: &Button) {
         match btn {
             &Button::Keyboard(Key::Up) => {
-                if self.is_playing() {
-                    if self.players[0].position_y > -175.0 {
-                        self.players[0].move_up();
-                    }
-                } else {
-                    if self.menu.selected_item == 0 {
-                        self.menu.selected_item = 2;
-                    } else {
-                        self.menu.selected_item -= 1;
-                    }
+                if self.players[0].position_y >= -175.0 {
+                    self.players[0].move_up();
                 }
             },
             &Button::Keyboard(Key::Down) => {
-                if self.is_playing() {
-                    if self.players[0].position_y < 175.0 {
-                        self.players[0].move_down();
-                    }
-                } else {
-                    if self.menu.selected_item == 2 {
-                        self.menu.selected_item = 0;
-                    } else {
-                        self.menu.selected_item += 1;
-                    }
+                if self.players[0].position_y + self.players[0].height <= 175.0 {
+                    self.players[0].move_down();
                 }
             },
             &Button::Keyboard(Key::W) => {
-                if self.is_playing() {
-                    if self.players[1].position_y > -175.0 {
-                        self.players[1].move_up();
-                    }
+                if self.players[1].position_y >= -175.0 {
+                    self.players[1].move_up();
                 }
             },
             &Button::Keyboard(Key::S) => {
-                if self.is_playing() {
-                    if self.players[1].position_y < 175.0 {
-                        self.players[1].move_down();
-                    }
+                if self.players[1].position_y + self.players[1].height <= 175.0 {
+                    self.players[1].move_down();
                 }
             },
             &Button::Keyboard(Key::Space) => {
